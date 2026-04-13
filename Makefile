@@ -80,7 +80,7 @@ CXXFLAGS += -MD -Ithird-party/lz4 -DCONFIG_H=\"$(CONFIG_H)\"
 ifeq ($(DEBUG_S),1)
         CXXFLAGS += -fno-omit-frame-pointer -DDEBUG
 else
-        CXXFLAGS += -Werror -O2 -funroll-loops -fno-omit-frame-pointer
+        CXXFLAGS += -Werror -Wno-class-memaccess -Wno-maybe-uninitialized -Wno-unused-variable -Wno-format-truncation -Wno-address-of-packed-member -O2 -funroll-loops -fno-omit-frame-pointer
 endif
 ifeq ($(CHECK_INVARIANTS_S),1)
 	CXXFLAGS += -DCHECK_INVARIANTS
@@ -148,11 +148,10 @@ OBJFILES := $(patsubst %.cc, $(O)/%.o, $(SRCFILES))
 
 MASSTREE_OBJFILES := $(patsubst masstree/%.cc, $(O)/%.o, $(MASSTREE_SRCFILES))
 
-BENCH_CXXFLAGS := $(CXXFLAGS)
-BENCH_LDFLAGS := $(LDFLAGS) -ldb_cxx -lz -lrt -lcrypt -laio -ldl -lssl -lcrypto
+BENCH_CXXFLAGS := $(CXXFLAGS) -DNO_BDB
+BENCH_LDFLAGS := $(LDFLAGS) -lz -lrt -lcrypt -ldl -lssl -lcrypto
 
-BENCH_SRCFILES = benchmarks/bdb_wrapper.cc \
-	benchmarks/bench.cc \
+BENCH_SRCFILES = benchmarks/bench.cc \
 	benchmarks/encstress.cc \
 	benchmarks/bid.cc \
 	benchmarks/masstree/kvrandom.cc \
