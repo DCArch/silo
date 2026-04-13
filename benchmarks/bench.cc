@@ -11,6 +11,7 @@
 #include <sys/sysinfo.h>
 
 #include "bench.h"
+#include "../dcsim_hooks.h"
 
 #include "../counter.h"
 #include "../scopedperf.hh"
@@ -235,6 +236,7 @@ bench_runner::run()
   barrier_a.wait_for(); // wait for all threads to start up
   timer t, t_nosync;
   barrier_b.count_down(); // bombs away!
+  DCSimStartGlobalROI();
   if (run_mode == RUNMODE_TIME) {
     sleep(runtime);
     running = false;
@@ -244,6 +246,7 @@ bench_runner::run()
     workers[i]->join();
   const unsigned long elapsed_nosync = t_nosync.lap();
   db->do_txn_finish(); // waits for all worker txns to persist
+  DCSimEndGlobalROI();
   size_t n_commits = 0;
   size_t n_aborts = 0;
   uint64_t latency_numer_us = 0;
