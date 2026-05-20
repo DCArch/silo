@@ -80,7 +80,7 @@ CXXFLAGS += -MD -Ithird-party/lz4 -DCONFIG_H=\"$(CONFIG_H)\"
 ifeq ($(DEBUG_S),1)
         CXXFLAGS += -fno-omit-frame-pointer -DDEBUG
 else
-        CXXFLAGS += -Werror -Wno-class-memaccess -Wno-maybe-uninitialized -Wno-unused-variable -Wno-format-truncation -Wno-address-of-packed-member -O2 -funroll-loops -fno-omit-frame-pointer
+        CXXFLAGS += -Werror -Wno-class-memaccess -Wno-maybe-uninitialized -Wno-unused-variable -Wno-format-truncation -Wno-address-of-packed-member -Wno-deprecated-declarations -Wno-template-id-cdtor -Wno-dangling-reference -O2 -funroll-loops -fno-omit-frame-pointer
 endif
 ifeq ($(CHECK_INVARIANTS_S),1)
 	CXXFLAGS += -DCHECK_INVARIANTS
