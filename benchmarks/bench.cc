@@ -236,6 +236,22 @@ bench_runner::run()
   barrier_a.wait_for(); // wait for all threads to start up
   timer t, t_nosync;
   barrier_b.count_down(); // bombs away!
+  // DCSim: warm up before marking the ROI. The workers are now executing real
+  // transactions; let them commit a batch first so the Masstree working set,
+  // allocator free-lists, RCU/GC state and instruction cache are warm before the
+  // measured (ROI) region begins. This only delays the ROI start past warmup; the
+  // ROI scope and the -r/-n run semantics that follow are unchanged.
+  {
+    const size_t dcsim_warmup_txns = size_t(nthreads) * 2000;
+    for (;;) {
+      size_t warm = 0;
+      for (size_t i = 0; i < nthreads; i++)
+        warm += workers[i]->get_ntxn_commits();
+      if (warm >= dcsim_warmup_txns || !running)
+        break;
+      usleep(1000);
+    }
+  }
   DCSimStartGlobalROI();
   if (run_mode == RUNMODE_TIME) {
     sleep(runtime);
